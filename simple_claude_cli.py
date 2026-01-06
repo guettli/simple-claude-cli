@@ -17,8 +17,19 @@ from anthropic import Anthropic
 class ClaudeAgentCLI:
     """CLI for interacting with Claude using tool calling."""
     
-    def __init__(self, api_key: str = None, model: str = "claude-3-7-sonnet-20250219"):
-        """Initialize the CLI with API credentials."""
+    def __init__(
+        self, 
+        api_key: str = None, 
+        model: str = "claude-3-7-sonnet-20250219",
+        command_timeout: int = 300
+    ):
+        """Initialize the CLI with API credentials.
+        
+        Args:
+            api_key: Anthropic API key (defaults to ANTHROPIC_API_KEY env var)
+            model: Claude model to use
+            command_timeout: Timeout in seconds for bash command execution (default: 300)
+        """
         self.api_key = api_key or os.environ.get("ANTHROPIC_API_KEY")
         if not self.api_key:
             raise ValueError(
@@ -27,6 +38,7 @@ class ClaudeAgentCLI:
         
         self.client = Anthropic(api_key=self.api_key)
         self.model = model
+        self.command_timeout = command_timeout
         self.conversation_history: List[Dict[str, Any]] = []
         self.system_prompt = self._build_system_prompt()
         
@@ -43,7 +55,13 @@ When given a task, you should:
 
 You have access to tools like: bash, git, rg (ripgrep), gh (GitHub CLI), curl, and any other standard Unix utilities.
 
-Always explain what you're doing and why. Be concise but thorough."""
+Always explain what you're doing and why. Be concise but thorough.
+
+IMPORTANT SECURITY NOTE: You are executing commands on the user's machine. Be careful and:
+- Avoid destructive operations without explaining them first
+- Don't execute commands that could harm the system
+- Be cautious with rm, chmod, and other potentially dangerous commands
+- Always validate paths and inputs when possible"""
 
     def _get_tools(self) -> List[Dict[str, Any]]:
         """Define the tools available to Claude."""
@@ -69,7 +87,11 @@ Always explain what you're doing and why. Be concise but thorough."""
         ]
     
     def _execute_bash(self, command: str, description: str) -> Dict[str, Any]:
-        """Execute a bash command and return the result."""
+        """Execute a bash command and return the result.
+        
+        WARNING: This executes arbitrary commands from Claude. Only use this CLI
+        in environments where you trust Claude to execute commands safely.
+        """
         print(f"\n🔧 Executing: {description}")
         print(f"   Command: {command}")
         
@@ -79,7 +101,7 @@ Always explain what you're doing and why. Be concise but thorough."""
                 shell=True,
                 capture_output=True,
                 text=True,
-                timeout=300,  # 5 minute timeout
+                timeout=self.command_timeout,
                 cwd=os.getcwd()
             )
             
@@ -100,7 +122,7 @@ Always explain what you're doing and why. Be concise but thorough."""
         except subprocess.TimeoutExpired:
             return {
                 "stdout": "",
-                "stderr": "Command timed out after 300 seconds",
+                "stderr": f"Command timed out after {self.command_timeout} seconds",
                 "exit_code": -1,
                 "success": False
             }

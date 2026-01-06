@@ -9,11 +9,32 @@ A simple command-line interface for Claude's Agent API with tool calling capabil
 - **Session-based**: One CLI invocation = one session with conversation history
 - **Tool execution**: Claude autonomously runs commands and iterates based on results
 
+## Security Warning
+
+⚠️ **This CLI allows Claude to execute arbitrary bash commands on your machine.** Only use this in:
+- Development environments where you trust Claude's decisions
+- Sandboxed/containerized environments
+- Systems where the potential impact of commands is limited
+
+Claude is instructed to be careful, but you should:
+- Review what Claude plans to do before confirming
+- Monitor command execution
+- Use in controlled environments
+- Set appropriate timeouts
+
 ## Installation
 
 ```bash
 pip install -r requirements.txt
 ```
+
+## Configuration
+
+The CLI supports the following environment variables:
+- `ANTHROPIC_API_KEY` (required): Your Anthropic API key
+- Command timeout: Can be configured programmatically (default: 300 seconds)
+
+Model selection: Uses `claude-3-7-sonnet-20250219` by default (supports tool calling)
 
 ## Usage
 
