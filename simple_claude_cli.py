@@ -33,7 +33,7 @@ class ClaudeAgentCLI:
         self.api_key = api_key or os.environ.get("ANTHROPIC_API_KEY")
         if not self.api_key:
             raise ValueError(
-                "ANTHROPIC_API_KEY environment variable must be set or provide api_key"
+                "ANTHROPIC_API_KEY environment variable must be set or api_key parameter must be provided"
             )
         
         self.client = Anthropic(api_key=self.api_key)
@@ -91,11 +91,17 @@ IMPORTANT SECURITY NOTE: You are executing commands on the user's machine. Be ca
         
         WARNING: This executes arbitrary commands from Claude. Only use this CLI
         in environments where you trust Claude to execute commands safely.
+        
+        Note: shell=True is required here to support pipes, redirects, and shell
+        features that Claude needs for complex tasks. This is an intentional design
+        choice for an agent that needs full shell capabilities.
         """
         print(f"\n🔧 Executing: {description}")
         print(f"   Command: {command}")
         
         try:
+            # shell=True is required for agent functionality (pipes, redirects, etc.)
+            # Commands come from Claude API, not direct user input
             result = subprocess.run(
                 command,
                 shell=True,
