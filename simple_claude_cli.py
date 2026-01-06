@@ -194,25 +194,46 @@ Always explain what you're doing and why. Be concise but thorough."""
         print("=" * 60)
         print("Simple Claude CLI - Agent Mode")
         print("=" * 60)
-        print("Enter your requests (press Ctrl-D to exit)")
+        print("Enter your requests (empty line + Ctrl-D to exit)")
         print(f"Working directory: {os.getcwd()}")
         print(f"Model: {self.model}")
         print("=" * 60)
         
+        is_tty = sys.stdin.isatty()
+        
         try:
             while True:
                 try:
-                    print("\n" + ">" * 3 + " Your request: ", end="", flush=True)
-                    user_input = sys.stdin.read()
+                    if is_tty:
+                        print("\n" + ">" * 3 + " Your request (end with empty line):")
                     
-                    if not user_input or not user_input.strip():
-                        print("\nEmpty input. Use Ctrl-D to exit.")
+                    # Read lines until we get an empty line or EOF
+                    lines = []
+                    while True:
+                        try:
+                            line = sys.stdin.readline()
+                            if not line:  # EOF
+                                if not lines:
+                                    raise EOFError
+                                break
+                            line = line.rstrip('\n\r')
+                            if not line and lines:  # Empty line after some input
+                                break
+                            if line:  # Non-empty line
+                                lines.append(line)
+                        except KeyboardInterrupt:
+                            raise
+                    
+                    if not lines:
+                        if is_tty:
+                            print("\nEmpty input.")
                         continue
                     
-                    self.chat(user_input.strip())
+                    user_input = "\n".join(lines)
+                    self.chat(user_input)
                     
                 except EOFError:
-                    # Ctrl-D pressed
+                    # Ctrl-D pressed or stdin closed
                     print("\n\n" + "=" * 60)
                     print("Session ended. Goodbye!")
                     print("=" * 60)

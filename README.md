@@ -27,13 +27,18 @@ Run the CLI:
 python3 simple_claude_cli.py
 ```
 
-Enter your requests at the prompt. Claude will:
+Enter your requests at the prompt. You can enter multi-line requests - just press Enter twice (empty line) to submit. Claude will:
 1. Create a plan for your task
 2. Execute necessary commands (bash, git, tests, etc.)
 3. Iterate and fix issues based on results
 4. Provide feedback throughout
 
-Press `Ctrl-D` to end the session.
+Press `Ctrl-D` on an empty line to end the session.
+
+You can also pipe input:
+```bash
+echo "List all Python files" | python3 simple_claude_cli.py
+```
 
 ## Example
 
