@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "simple-claude-cli"
+version = "0.1.0"
+description = "A simple command-line interface for Claude's Agent API with tool calling capabilities"
+readme = "README.md"
+license = "MIT"
+authors = [
+    {name = "Thomas Güttler"}
+]
+requires-python = ">=3.7"
+keywords = ["claude", "cli", "agent", "anthropic", "ai"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "anthropic>=0.40.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/guettli/simple-claude-cli"
+Repository = "https://github.com/guettli/simple-claude-cli"
+Issues = "https://github.com/guettli/simple-claude-cli/issues"
+
+[project.scripts]
+simple-claude-cli = "simple_claude_cli:main"
